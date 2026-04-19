@@ -1,32 +1,17 @@
+import { useState } from "react";
 import { Plus, Download, ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageShell } from "@/components/finance/PageShell";
 import { DataTable, Table, type ColumnDef } from "@/components/finance/DataTable";
+import { NovoLancamentoDialog } from "@/components/finance/NovoLancamentoDialog";
 import { fmtKz, fmtDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-
-interface Lancamento {
-  id: string;
-  data: string;
-  conta: string;
-  descricao: string;
-  documento: string;
-  tipo: "Crédito" | "Débito";
-  valor: number;
-}
-
-const lancamentos: Lancamento[] = [
-  { id: "TX-1042", data: "2026-04-18", conta: "3.1 Publicidade", descricao: "Publicidade — Unitel", documento: "FT 2026/0412", tipo: "Crédito", valor: 850000 },
-  { id: "TX-1041", data: "2026-04-17", conta: "4.1 Pessoal", descricao: "Salários — Equipa Técnica", documento: "REC 2026/0089", tipo: "Débito", valor: 620000 },
-  { id: "TX-1040", data: "2026-04-16", conta: "3.2 Patrocínios", descricao: "Patrocínio — Banco BAI", documento: "FT 2026/0411", tipo: "Crédito", valor: 1200000 },
-  { id: "TX-1039", data: "2026-04-15", conta: "4.2 Operacionais", descricao: "ENDE — Energia Eléctrica", documento: "FT 2026/0410", tipo: "Débito", valor: 145000 },
-  { id: "TX-1038", data: "2026-04-14", conta: "3.1 Publicidade", descricao: "Spot Publicitário — TPA", documento: "FT 2026/0409", tipo: "Crédito", valor: 380000 },
-  { id: "TX-1037", data: "2026-04-13", conta: "4.2 Operacionais", descricao: "Manutenção Estúdio", documento: "FT 2026/0408", tipo: "Débito", valor: 92000 },
-  { id: "TX-1036", data: "2026-04-12", conta: "3.1 Publicidade", descricao: "Campanha — Movicel", documento: "FT 2026/0407", tipo: "Crédito", valor: 540000 },
-  { id: "TX-1035", data: "2026-04-11", conta: "4.1 Pessoal", descricao: "Subsídios de Alimentação", documento: "REC 2026/0088", tipo: "Débito", valor: 180000 },
-];
+import { useLancamentos, type Lancamento } from "@/stores/lancamentos";
 
 const Lancamentos = () => {
+  const [open, setOpen] = useState(false);
+  const lancamentos = useLancamentos((s) => s.items);
+
   const columns: ColumnDef<Lancamento>[] = [
     { key: "id", header: "Nº", className: "font-mono w-28", render: (r) => <span className="text-muted-foreground">{r.id}</span> },
     { key: "data", header: "Data", render: (r) => <span className="text-muted-foreground">{fmtDate(r.data)}</span> },
@@ -68,7 +53,11 @@ const Lancamentos = () => {
           <Button variant="outline" size="sm" className="gap-2">
             <Download className="h-4 w-4" /> Exportar
           </Button>
-          <Button size="sm" className="gap-2 bg-gradient-header shadow-brand hover:opacity-95">
+          <Button
+            size="sm"
+            className="gap-2 bg-gradient-header shadow-brand hover:opacity-95"
+            onClick={() => setOpen(true)}
+          >
             <Plus className="h-4 w-4" /> Novo Lançamento
           </Button>
         </>
@@ -88,6 +77,8 @@ const Lancamentos = () => {
       >
         <Table columns={columns} data={lancamentos} rowKey={(r) => r.id} />
       </DataTable>
+
+      <NovoLancamentoDialog open={open} onOpenChange={setOpen} />
     </PageShell>
   );
 };
