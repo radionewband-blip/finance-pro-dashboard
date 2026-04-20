@@ -3,7 +3,11 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/hooks/useAuth";
+import { EmpresasProvider } from "@/hooks/useEmpresas";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index.tsx";
+import Auth from "./pages/Auth.tsx";
 import PlanoContas from "./pages/PlanoContas.tsx";
 import Lancamentos from "./pages/Lancamentos.tsx";
 import ContasPagar from "./pages/ContasPagar.tsx";
@@ -20,17 +24,22 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/plano-contas" element={<PlanoContas />} />
-          <Route path="/lancamentos" element={<Lancamentos />} />
-          <Route path="/pagar" element={<ContasPagar />} />
-          <Route path="/receber" element={<ContasReceber />} />
-          <Route path="/conta-corrente" element={<ContaCorrente />} />
-          <Route path="/dre" element={<Dre />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <EmpresasProvider>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+              <Route path="/plano-contas" element={<ProtectedRoute><PlanoContas /></ProtectedRoute>} />
+              <Route path="/lancamentos" element={<ProtectedRoute><Lancamentos /></ProtectedRoute>} />
+              <Route path="/pagar" element={<ProtectedRoute><ContasPagar /></ProtectedRoute>} />
+              <Route path="/receber" element={<ProtectedRoute><ContasReceber /></ProtectedRoute>} />
+              <Route path="/conta-corrente" element={<ProtectedRoute><ContaCorrente /></ProtectedRoute>} />
+              <Route path="/dre" element={<ProtectedRoute><Dre /></ProtectedRoute>} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </EmpresasProvider>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
